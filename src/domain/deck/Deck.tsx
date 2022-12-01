@@ -5,6 +5,7 @@ class Deck {
     private deck: Card[];
 
     constructor(playerSize: number) {
+        this.deck = []
         while (this.deck.length < playerSize * 2 + 5) {
             const newCard = Card.getCard(
                 this.getRandomInt(0, 4),

@@ -6,6 +6,8 @@ import reportWebVitals from "./reportWebVitals";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import BotRoom from "./components/BotRoom";
 import MultiRoom from "./components/MultiRoom";
+import Signin from "./components/Signin";
+import Signup from "./components/Signup";
 
 const router = createBrowserRouter([
   {
@@ -19,6 +21,14 @@ const router = createBrowserRouter([
   {
     path: "worlds",
     element: <MultiRoom />,
+  },
+  {
+    path: "login",
+    element: <Signin />,
+  },
+  {
+    path: "signup",
+    element: <Signup />,
   },
 ]);
 

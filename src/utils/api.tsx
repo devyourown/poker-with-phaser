@@ -25,6 +25,7 @@ function makeRequest(api: string, method: Methods, data: {}) {
     return {
         method: method,
         url: API_END_POINT + api,
+        headers: {'Content-Type': 'application/json'},
         data: data
     };
 }

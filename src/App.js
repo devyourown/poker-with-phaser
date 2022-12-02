@@ -1,18 +1,19 @@
 import "./App.css";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import call, { Methods } from "./utils/api";
+import { getTokenHeader } from "./utils/statusChecker";
 
 function App() {
-  const [data, setData] = useState([]);
-  const clickAPI = () => {
-    const result = call("/posts", Methods.GET, {});
-    result.then((response) => {
-      if (response.status === 200) {
-        setData(response.data);
+  const onEnter = useEffect(() => {
+    call("/room/auto-enter", Methods.POST, getTokenHeader()).then(
+      (response) => {
+        if (response.status === 200) {
+          localStorage.setItem("roomId", response.roomId);
+        }
       }
-    });
-  };
+    );
+  }, []);
 
   return (
     <div className="App">
@@ -22,18 +23,8 @@ function App() {
           <button>Play with bot</button>
         </Link>
         <Link to="worlds">
-          <button>Play with worlds</button>
+          <button onClick={onEnter}>Play with worlds</button>
         </Link>
-      </div>
-      <button onClick={clickAPI}>API</button>
-      <div>
-        {data.map((value, index) => {
-          return (
-            <div key={index}>
-              <div>title: {value.title}</div>
-            </div>
-          );
-        })}
       </div>
     </div>
   );

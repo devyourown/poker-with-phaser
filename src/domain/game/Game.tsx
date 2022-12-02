@@ -17,6 +17,12 @@ export enum Action {
     BET
 }
 
+interface GameProp {
+    players: Player[],
+    small: number,
+    big: number
+}
+
 class Game {
     private potSize: number;
     private betSize: number;
@@ -26,7 +32,7 @@ class Game {
     private lastPlayerIndex: number;
     private deck: Deck;
 
-    constructor(props) {
+    constructor(props: GameProp) {
         this.players = props.players;
         this.deck = new Deck(this.players.length);
         this.distributeHands();

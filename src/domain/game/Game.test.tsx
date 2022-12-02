@@ -1,5 +1,5 @@
-import Player from "../player/Player";
-import Game, { Action, GameStatus } from "./Game"
+import Player from "../player/Player.js";
+import Game, { Action, GameStatus } from "./Game.js"
 
 describe('Game test', () => {
     let game: Game;

@@ -1,10 +1,25 @@
-import { METHODS } from "http";
-import React, { useEffect, useRef, useState } from "react";
+import React, { RefObject, useCallback, useEffect, useRef, useState } from "react";
 import call, { Methods } from "../utils/api";
+import { useCanvas } from "../utils/hooks/useCanvas";
 
-function Game({ players, bigBlind }) {
+type Player = {
+  
+}
+
+type GameProps = {
+  canvasWidth: number,
+  canvasHeight: number,
+  players: Player[],
+  bigBlind: number,
+}
+
+const Game: React.FC<GameProps> = ({
+  canvasWidth,
+  canvasHeight,
+  players,
+  bigBlind
+}) => {
   let gameId = useRef("");
-  const canvasRef = useRef(null);
   const [playOrder, setPlayOrder] = useState(0);
   const [board, setBoard] = useState([]);
   const [potSize, setPotSize] = useState(0);
@@ -12,9 +27,9 @@ function Game({ players, bigBlind }) {
   const [status, setStatus] = useState("PREFLOP");
   const [myTurn, setMyTurn] = useState(false);
 
-  function onSubmit(e) {
+  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const className = e.submitter.className;
+    const className = e.currentTarget.value;
     call("/game/action", Methods.POST, {
       gameId: gameId.current,
       action: className,
@@ -22,8 +37,8 @@ function Game({ players, bigBlind }) {
     });
   }
 
-  function getGame() {
-    call("/game/result", Methods.GET).then((response) => {
+  const getGame = useCallback(() => {
+    call("/game/result", Methods.GET)?.then((response: any) => {
       if (response.status === 200) {
         if (playOrder !== response.turnIndex) {
           setPlayOrder(response.data.turnIndex);
@@ -35,11 +50,12 @@ function Game({ players, bigBlind }) {
         }
       }
     });
-  }
+  }, [playOrder]);
+  
 
   useEffect(() => {
     function makeGame() {
-      call("/game/game", Methods.POST).then((response) => {
+      call("/game/game", Methods.POST)?.then((response) => {
         if (response.status === 200) {
           setMyTurn(response.data.isMyTurn);
           gameId.current = response.data.gameId;
@@ -48,9 +64,9 @@ function Game({ players, bigBlind }) {
     }
     makeGame();
   });
+
   return (
     <div>
-      <canvas ref={canvasRef} />
       <form className="action" onSubmit={onSubmit}>
         <button type="submit" className="BET">
           Bet

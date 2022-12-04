@@ -9,7 +9,7 @@ export enum Methods {
 
 const API_END_POINT = "http://localhost:8080"
 
-export default function call(api: string, method: Methods, data: {},) {
+export default function call(api: string, method: Methods, data?: any) {
     let result;
     try {
         const request = makeRequest(api, method, data);
@@ -21,8 +21,9 @@ export default function call(api: string, method: Methods, data: {},) {
     return result;
 }
 
-function makeRequest(api: string, method: Methods, data: {}) {
-    data = JSON.stringify(data);
+function makeRequest(api: string, method: Methods, data?: any) {
+    if (data)
+        data = JSON.stringify(data);
     const token = localStorage.getItem("TOKEN");
     return {
         method: method,

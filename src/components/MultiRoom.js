@@ -1,34 +1,62 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import call, { Methods } from "../utils/api";
-import isLogined from "../utils/statusChecker";
+import Player from "./Player";
 
 function MultiRoom() {
-  if (!isLogined()) window.location.href = "/login";
   if (!localStorage.getItem("roomId")) window.location.href = "/";
 
-  const [roomId, setRoomId] = useState("");
+  const roomId = localStorage.getItem("roomId");
   const [players, setPlayers] = useState([]);
+  const [stop, setStop] = useState(false);
 
-  setRoomId(localStorage.getItem("roomId"));
-  useEffect(() => {
-    call("/room/status", Methods.GET, {
-      headers: `Bearer ${localStorage.getItem("TOKEN")}`,
-      data: roomId,
+  function getPlayers() {
+    call("/room/room-status", Methods.POST, {
+      roomId: roomId,
     }).then((response) => {
+      if (response.status === 403) window.location.href = "/login";
       if (response.status === 200) {
-        setRoomId(response.data.roomId);
-        response.data.players.forEach((player) => {
-          setPlayers(players.concat(player));
-        });
+        setPlayers(response.data.players);
+        if (response.data.status === "PLAYING") setStop(true);
       }
     });
-  }, [roomId, players]);
+  }
+
+  const onReady = useCallback(() => {
+    call("/room/player-status-change", Methods.POST, {
+      roomId: roomId,
+    });
+    getPlayers();
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!stop) {
+        getPlayers();
+      }
+    }, 3000);
+    return () => {
+      call("/room-out", Methods.POST, {});
+      clearInterval(interval);
+    };
+  }, []);
 
   return (
     <div>
-      {players.map((player) => {
-        return <div>{player.money}</div>;
-      })}
+      <div>방</div>
+      <div>
+        {players &&
+          players.map((player) => {
+            return (
+              <Player
+                id={player.id}
+                nickname={player.nickname}
+                money={player.money}
+                ready={player.ready}
+                onReady={onReady}
+              />
+            );
+          })}
+      </div>
     </div>
   );
 }

@@ -7,26 +7,20 @@ enum Suit {
     SPADE
 }
 
-class Card {
-    private suit: Suit;
-    private value: number;
-    private static cardMap: Map<string, Card> = new Map();
+export default class Card {
+    private suit: string;
+    private value: string;
 
-    private constructor(suit: Suit, value: number) {
+    private constructor(suit: string, value: string) {
         this.suit = suit;
         this.value = value;
     }
-    
-    public static getCard(suit: Suit, value: number): Card {
-        const cardStr = suit + ":" + value;
-        if (!this.cardMap.has(cardStr))
-            this.cardMap.set(cardStr, new Card(suit, value));
-        return this.cardMap.get(cardStr) as Card;
+
+    getSuit() {
+        return this.suit;
     }
 
-    public toString(): string {
-        return this.suit + ":" + this.value;
+    getValue() {
+        return this.value;
     }
 }
-
-export default Card;

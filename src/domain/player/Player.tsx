@@ -7,9 +7,10 @@ export enum PlayerStatus {
     PLAYING
 }
 
-class Player {
+export default class Player {
     private id: string;
     private money: number;
+    private nikcname: string;
     private hands: Card[];
     private status: PlayerStatus;
     private betSize: number;
@@ -21,43 +22,11 @@ class Player {
         this.betSize = 0;
     }
 
-    public call(betSize: number) {
-        if (this.betSize - this.getBetSize > this.money)
-            throw 'Over Betting.';
-        this.money -= this.betSize - this.getBetSize;
-        this.betSize = betSize;
+    get getMoney() {
+        return this.money;
     }
 
-    public bet(betSize: number) {
-        if (betSize > this.money)
-            throw 'Over Betting.';
-        this.money -= betSize;
-        this.betSize = betSize;
-    }
-
-    public setHands(hands: Card[]) {
-        this.hands = hands;
-    }
-
-    public equals(player: Player): boolean {
-        return this.id === player.id;
-    }
-
-    get getStatus() {
-        return this.status;
-    }
-
-    public setFold() {
-        this.status = PlayerStatus.FOLD;
-    }
-
-    get getBetSize() {
-        return this.betSize;
-    }
-
-    public resetBetSize() {
-        this.betSize = 0;
+    get getNickname() {
+        return this.nikcname;
     }
 }
-
-export default Player;

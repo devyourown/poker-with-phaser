@@ -1,8 +1,7 @@
 import { Methods } from './../../utils/api';
-import React from 'react';
 import call from '../../utils/api';
-import Player, { PlayerStatus } from '../player/Player';
-import Card from '../deck/Card';
+import Player from '../player/Player';
+import Card from '../card/Card';
 
 export enum GameStatus {
     PRE_FLOP,
@@ -32,13 +31,12 @@ export default class Game {
     private potSize: number;
     private currentBetSize: number;
     private status: string;
-    private players: Player[];
-    private isProgressed: boolean;
     private hands: Card[];
     private playerIndex: number;
+    private lastActionIndex: number;
+    private lastAction: string;
 
-    constructor({players, small, big}: GameProp) {
-        this.players = players;
+    constructor({small, big}: GameProp) {
         call("/game/game", Methods.POST)?.then((response) => {
             if (response.status === 200) {
               this.isMyTurn = response.data.isMyTurn;
@@ -46,6 +44,20 @@ export default class Game {
               this.board = [];
               this.potSize = small + big;
               this.currentBetSize = big;
+              this.lastActionIndex = -1;
+              this.setHands();
+            }
+        });
+    }
+
+    private setHands() {
+        call("/game/hands", Methods.GET)?.then((response) => {
+            this.hands = [];
+            for (let i=0; i<2; i++) {
+                this.hands.push(new Card(
+                    response.data.hands[i].suit,
+                    response.data.hands[i].value
+                ));
             }
         });
     }
@@ -53,16 +65,26 @@ export default class Game {
     getGame() {
         call("/game/result", Methods.GET)?.then((response: any) => {
             if (response.status === 200) {
-                this.isProgressed = true;
-                this.board = response.data.board;
+                this.setBoard(response.data.board);
                 this.potSize = response.data.potSize;
                 this.currentBetSize = response.data.currentBet;
                 this.status = response.data.gameStatus;
                 this.isMyTurn = response.data.isMyTurn;
+                this.lastActionIndex = response.data.lastActionIndex;
+                this.lastAction = response.data.lastAction;
             }
-        }).catch((error) => {
-            this.isProgressed = false;
         });
+    }
+
+    private setBoard(board: any[]) {
+        if (board.length === this.board.length)
+            return ;
+        board.forEach((value) => {
+            this.board.push(new Card(
+                value.suit,
+                value.value
+            ));
+        })
     }
 
     playAction(action: String, betSize: number) {
@@ -75,10 +97,6 @@ export default class Game {
 
     getIsMyTurn() {
         return this.isMyTurn;
-    }
-    
-    getIsProgressed() {
-        return this.isProgressed;
     }
 
     getBoard() {
@@ -95,5 +113,13 @@ export default class Game {
 
     getPlayerIndex() {
         return this.playerIndex;
+    }
+
+    getLastActionIndex() {
+        return this.lastActionIndex;
+    }
+
+    getLastAction() {
+        return this.lastAction;
     }
 }

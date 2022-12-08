@@ -9,6 +9,7 @@ export class Room {
 
     constructor(roomId: string) {
         this.roomId = roomId;
+        this.players = [];
         this.setPlayersFromServer();
     }
 
@@ -22,8 +23,19 @@ export class Room {
         });
     }
 
-    private setPlayers(players: []) {
-
+    private setPlayers(players: any[]) {
+      if (this.players === null)
+        return;
+      if (players.length === this.players.length)
+        return;
+      this.players = [];
+      players.forEach((value) => {
+        this.players.push(new Player(
+          value.money,
+          value.nickname,
+          value.isReady
+        ));
+      });
     }
 
     getPlayers() {

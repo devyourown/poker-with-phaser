@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import Card from "../domain/deck/Card";
+import Card from "../domain/card/Card";
 import Game from "../domain/game/Game";
 import Player from "../domain/player/Player";
 import { Room } from "../domain/room/Room";
@@ -15,14 +15,15 @@ const playerPosition = [[firstPosX, firstPosY + 150],
 export default class PokerScene extends Phaser.Scene {
     private room: Room;
     private pokerGame: Game;
+    private lastActionIndex: number;
 
     constructor() {
         super('PokerScene');
+        this.lastActionIndex = -1;
     }
 
     preload() {
         this.load.html('actionForm', process.env.PUBLIC_URL + '/assets/html/action-form.html');
-        this.load.html('readybutton', process.env.PUBLIC_URL + '/assets/html/readybutton.html');
         this.load.image('backCard', process.env.PUBLIC_URL + '/assets/back.png');
         this.load.image('user', process.env.PUBLIC_URL + '/assets/user_icon.png');
     }
@@ -81,10 +82,33 @@ export default class PokerScene extends Phaser.Scene {
 
     private drawGame() {
         this.drawPlayerCards();
+        this.drawCurrentTurnLight();
         this.drawBoard();
         this.drawPotSize();
+        this.drawAction();
         if (this.pokerGame.getIsMyTurn())
             this.drawActionForm();
+    }
+
+    private drawCurrentTurnLight() {
+
+    }
+
+    private drawAction() {
+        if (this.lastActionIndex === this.pokerGame.getLastActionIndex())
+            return ;
+        this.lastActionIndex = this.pokerGame.getLastActionIndex();
+        const action = this.pokerGame.getLastAction();
+        const textAnimated = this.add.text(
+            playerPosition[this.lastActionIndex][0],
+            playerPosition[this.lastActionIndex][1] + 30,
+            action);
+        this.tweens.add({
+            targets: textAnimated,
+            alpha: 0,
+            duration: 300,
+            ease: 'Power2'
+        });
     }
 
     private drawActionForm() {
@@ -123,7 +147,7 @@ export default class PokerScene extends Phaser.Scene {
             playerHand.scale = 0.25;
             playerHand2.scale = 0.25;
         });
-}
+    }
 
     private loadHands() {
         const hands = this.pokerGame.getHands();

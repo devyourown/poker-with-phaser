@@ -14,12 +14,15 @@ const playerPosition = [[firstPosX, firstPosY + 150],
 
 export default class PokerScene extends Phaser.Scene {
     private room: Room;
-    private pokerGame: Game;
+    private pokerGame: Game | null;
     private lastActionIndex: number;
+    private frameTime: number;
 
     constructor() {
         super('PokerScene');
         this.lastActionIndex = -1;
+        this.frameTime = 0;
+        this.pokerGame = null;
     }
 
     preload() {
@@ -73,11 +76,21 @@ export default class PokerScene extends Phaser.Scene {
         }
     }
 
-    update() {
+    update(time: number, delta: number) {
+        this.frameTime += delta;
+        if (this.frameTime < 1000)
+            return ;
         if ("PLAYING" === this.room.getRoomStatus()) {
-            this.pokerGame = this.room.makeGame();
+            this.frameTime = 0;
+            this.getGame()
             this.drawGame();
         }
+    }
+
+    private getGame() {
+        if (this.pokerGame === null)
+            this.pokerGame = this.room.makeGame();
+        this.pokerGame.getGame();
     }
 
     private drawGame() {
@@ -86,7 +99,7 @@ export default class PokerScene extends Phaser.Scene {
         this.drawBoard();
         this.drawPotSize();
         this.drawAction();
-        if (this.pokerGame.getIsMyTurn())
+        if (this.pokerGame?.getIsMyTurn())
             this.drawActionForm();
     }
 
@@ -95,10 +108,10 @@ export default class PokerScene extends Phaser.Scene {
     }
 
     private drawAction() {
-        if (this.lastActionIndex === this.pokerGame.getLastActionIndex())
+        if (this.lastActionIndex === this.pokerGame!.getLastActionIndex())
             return ;
-        this.lastActionIndex = this.pokerGame.getLastActionIndex();
-        const action = this.pokerGame.getLastAction();
+        this.lastActionIndex = this.pokerGame!.getLastActionIndex();
+        const action = this.pokerGame!.getLastAction();
         const textAnimated = this.add.text(
             playerPosition[this.lastActionIndex][0],
             playerPosition[this.lastActionIndex][1] + 30,
@@ -117,14 +130,14 @@ export default class PokerScene extends Phaser.Scene {
         form.on('click', (event: any) => {
             event.preventDefault();
             const inputBet: any = form.getChildByID('betSize');
-            this.pokerGame.playAction(event.target.innerText,
+            this.pokerGame!.playAction(event.target.innerText,
                 inputBet.value);
         })
     }
 
     private drawPlayerCards() {
         for (let i=0; i<playerPosition.length; i++) {
-            if (i === this.pokerGame.getPlayerIndex()) {
+            if (i === this.pokerGame!.getPlayerIndex()) {
                 this.drawHands(i);
                 continue;
             }
@@ -150,7 +163,7 @@ export default class PokerScene extends Phaser.Scene {
     }
 
     private loadHands() {
-        const hands = this.pokerGame.getHands();
+        const hands = this.pokerGame!.getHands();
         hands.forEach((card, index) => {
             this.load.image('hand' + index, process.env.PUBLIC_URL 
             + '/assets/' + card.getSuit() + 
@@ -172,7 +185,7 @@ export default class PokerScene extends Phaser.Scene {
     }
 
     private drawBoard() {
-        const board = this.pokerGame.getBoard();
+        const board = this.pokerGame!.getBoard();
         this.loadBoard(board);
         this.load.start();
         this.load.once(Phaser.Loader.Events.COMPLETE, () => {
@@ -193,7 +206,7 @@ export default class PokerScene extends Phaser.Scene {
     }
 
     private drawPotSize() {
-        const potSize = this.pokerGame.getPotSize();
+        const potSize = this.pokerGame!.getPotSize();
         this.add.text(650, 380, 'Pot: $' + potSize);
     }
 }

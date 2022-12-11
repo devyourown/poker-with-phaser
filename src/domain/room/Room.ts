@@ -6,26 +6,45 @@ export class Room {
     private roomId: string;
     private players: Player[]
     private status: string;
+    private isChanged: boolean;
 
     constructor(roomId: string) {
         this.roomId = roomId;
         this.players = [];
-        this.setPlayersFromServer();
+        this.isChanged = true;
+        this.update();
     }
 
-    private setPlayersFromServer() {
-        call("/room/room-status", Methods.POST, {
-          roomId: this.roomId,
-        })?.then((response) => {
-          if (response.status === 200) {
+
+    update() {
+      this.isChanged = false;
+      call("/room/room-status", Methods.POST, {
+        roomId: this.roomId,
+      })?.then((response) => {
+        if (response.status === 200) {
+          if (this.isPlayerChanged(response.data.players)) {
             this.setPlayers(response.data.players);
+            this.isChanged = true;
           }
-        });
+          if (this.status !== response.data.status) {
+            this.status = response.data.status;
+            this.isChanged = true;
+          }
+        }
+      });
+    }
+
+    private isPlayerChanged(players: any[]): boolean {
+      if (this.players.length !== players.length)
+        return true;
+      for (let i=0; i < players.length; i++) {
+        if (this.players[i].getNickname !== players[i].nickname)
+          return true;
+      }
+      return false;
     }
 
     private setPlayers(players: any[]) {
-      if (this.players === null)
-        return;
       if (players.length === this.players.length)
         return;
       this.players = [];
@@ -38,6 +57,36 @@ export class Room {
       });
     }
 
+    makeGame() {
+      const prop: GameProp = {
+        playerIndex: this.getPlayerIndex(),
+        small: 100,
+        big: 200,
+      }
+      return new Game(prop);
+    }
+
+    private getPlayerIndex(): number {
+      call("/room/player-index", Methods.GET, {
+        roomId: this.roomId
+      })?.then((response) => {
+        return response.data;
+      });
+      return -1;
+    }
+
+    readyPlayer() {
+      call("/room/player-status-change", Methods.POST, {
+          roomId: this.roomId,
+      })?.then((response) => {
+        this.status = response.data.status;
+      });
+  }
+
+    getIschanged(): boolean {
+      return this.isChanged;
+    }
+
     getPlayers() {
       return this.players;
     }
@@ -46,22 +95,7 @@ export class Room {
         call("/room-out", Methods.POST, {});
     }
 
-    readyPlayer() {
-        call("/room/player-status-change", Methods.POST, {
-            roomId: this.roomId,
-        });
-    }
-
     getRoomStatus() {
       return this.status;
-    }
-
-    makeGame() {
-      const prop: GameProp = {
-        players: this.players,
-        small: 100,
-        big: 200,
-      }
-      return new Game(prop);
     }
 }

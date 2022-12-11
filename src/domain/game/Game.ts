@@ -19,14 +19,14 @@ export enum Action {
 }
 
 export interface GameProp {
-    players: Player[],
+    playerIndex: number,
     small: number,
     big: number
 }
 
 export default class Game {
     private gameId: string;
-    private isMyTurn: boolean;
+    private currentTurnIndex: number;
     private board: Card[];
     private potSize: number;
     private currentBetSize: number;
@@ -35,11 +35,12 @@ export default class Game {
     private playerIndex: number;
     private lastActionIndex: number;
     private lastAction: string;
+    private isChanged: boolean;
 
-    constructor({small, big}: GameProp) {
+    constructor({playerIndex, small, big}: GameProp) {
+        this.playerIndex = playerIndex;
         call("/game/game", Methods.POST)?.then((response) => {
             if (response.status === 200) {
-              this.isMyTurn = response.data.isMyTurn;
               this.gameId = response.data.gameId;
               this.board = [];
               this.potSize = small + big;
@@ -63,13 +64,13 @@ export default class Game {
     }
 
     getGame() {
-        call("/game/result", Methods.GET)?.then((response: any) => {
+        call("/game/game", Methods.GET)?.then((response: any) => {
             if (response.status === 200) {
                 this.setBoard(response.data.board);
                 this.potSize = response.data.potSize;
                 this.currentBetSize = response.data.currentBet;
                 this.status = response.data.gameStatus;
-                this.isMyTurn = response.data.isMyTurn;
+                this.currentTurnIndex = response.data.currentTurnIndex;
                 this.lastActionIndex = response.data.lastActionIndex;
                 this.lastAction = response.data.lastAction;
             }
@@ -95,8 +96,8 @@ export default class Game {
         });
     }
 
-    getIsMyTurn() {
-        return this.isMyTurn;
+    isMyTurn() {
+        return this.playerIndex === this.currentTurnIndex;
     }
 
     getBoard() {
@@ -113,6 +114,10 @@ export default class Game {
 
     getPlayerIndex() {
         return this.playerIndex;
+    }
+
+    getCurrentTurnIndex() {
+        return this.currentTurnIndex;
     }
 
     getLastActionIndex() {

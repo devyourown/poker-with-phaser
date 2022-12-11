@@ -9,14 +9,15 @@ const firstPosY = 150;
 const playerPosition = [[firstPosX, firstPosY + 150], 
 [firstPosX + 200, firstPosY], [firstPosX + 400, firstPosY], 
 [firstPosX + 600, firstPosY], [firstPosX + 800, firstPosY + 150], 
-[firstPosX + 200, firstPosY + 300], [firstPosX + 400, firstPosY + 300], 
-[firstPosX + 600, firstPosY + 300]];
+[firstPosX + 200, firstPosY + 340], [firstPosX + 400, firstPosY + 340], 
+[firstPosX + 600, firstPosY + 340]];
 
 export default class PokerScene extends Phaser.Scene {
     private room: Room;
     private pokerGame: Game | null;
     private lastActionIndex: number;
     private frameTime: number;
+    private readyButton: Phaser.GameObjects.Text;
 
     constructor() {
         super('PokerScene');
@@ -40,6 +41,8 @@ export default class PokerScene extends Phaser.Scene {
     }
 
     private drawRoom() {
+        if (!this.room.getIschanged())
+            return ;
         this.drawPlayerCircle();
         this.drawRoomButton();
         this.drawPlayers();
@@ -47,17 +50,22 @@ export default class PokerScene extends Phaser.Scene {
 
     private drawPlayerCircle() {
         for (let i=0; i<playerPosition.length; i++) {
-            this.add.circle(playerPosition[i][0], playerPosition[i][1], 30)
-            .setStrokeStyle(1, 0x33adfd);
-            if (this.room.getPlayers().length > i)
-                this.add.image(playerPosition[i][0], playerPosition[i][1], 'user');
+            if (this.room.getPlayers().length > i) {
+                const user = this.add.image(playerPosition[i][0], playerPosition[i][1], 'user');
+                user.scale = 0.6;
+            } else {
+                this.add.circle(playerPosition[i][0], playerPosition[i][1], 30)
+                .setStrokeStyle(1, 0x33adfd);
+            }
         }
     }
 
     private drawRoomButton() {
-        const readyButton= this.add.text(675, 300, 'Ready')
+        if (this.readyButton === null)
+            return ;
+        this.readyButton = this.add.text(675, 300, 'Ready')
         .setInteractive()
-        .on('pointerdown', () => this.onReady(readyButton));
+        .on('pointerdown', () => this.onReady(this.readyButton));
     }
 
     private onReady(button: Phaser.GameObjects.Text) {
@@ -78,11 +86,13 @@ export default class PokerScene extends Phaser.Scene {
 
     update(time: number, delta: number) {
         this.frameTime += delta;
-        if (this.frameTime < 1000)
+        if (this.frameTime < 3000)
             return ;
+        this.room.update();
+        this.drawRoom();
         if ("PLAYING" === this.room.getRoomStatus()) {
             this.frameTime = 0;
-            this.getGame()
+            this.getGame();
             this.drawGame();
         }
     }
@@ -99,12 +109,16 @@ export default class PokerScene extends Phaser.Scene {
         this.drawBoard();
         this.drawPotSize();
         this.drawAction();
-        if (this.pokerGame?.getIsMyTurn())
+        if (this.pokerGame?.isMyTurn())
             this.drawActionForm();
     }
 
     private drawCurrentTurnLight() {
-
+        const index = this.pokerGame!.getCurrentTurnIndex();
+        this.add.pointlight(
+            playerPosition[index][0], 
+            playerPosition[index][1]
+            , 0x33691e, 50, 1);
     }
 
     private drawAction() {
@@ -113,13 +127,14 @@ export default class PokerScene extends Phaser.Scene {
         this.lastActionIndex = this.pokerGame!.getLastActionIndex();
         const action = this.pokerGame!.getLastAction();
         const textAnimated = this.add.text(
-            playerPosition[this.lastActionIndex][0],
-            playerPosition[this.lastActionIndex][1] + 30,
+            playerPosition[this.lastActionIndex][0] - 20,
+            playerPosition[this.lastActionIndex][1] - 70,
             action);
+        textAnimated.scale = 1.5;
         this.tweens.add({
             targets: textAnimated,
             alpha: 0,
-            duration: 300,
+            duration: 2500,
             ease: 'Power2'
         });
     }
@@ -129,6 +144,8 @@ export default class PokerScene extends Phaser.Scene {
         form.addListener('click');
         form.on('click', (event: any) => {
             event.preventDefault();
+            if (event.target.innerText.length > 6)
+                return ;
             const inputBet: any = form.getChildByID('betSize');
             this.pokerGame!.playAction(event.target.innerText,
                 inputBet.value);
@@ -136,7 +153,7 @@ export default class PokerScene extends Phaser.Scene {
     }
 
     private drawPlayerCards() {
-        for (let i=0; i<playerPosition.length; i++) {
+        for (let i=0; i<this.room.getPlayers.length; i++) {
             if (i === this.pokerGame!.getPlayerIndex()) {
                 this.drawHands(i);
                 continue;
@@ -186,6 +203,8 @@ export default class PokerScene extends Phaser.Scene {
 
     private drawBoard() {
         const board = this.pokerGame!.getBoard();
+        if (board === null)
+            return ;
         this.loadBoard(board);
         this.load.start();
         this.load.once(Phaser.Loader.Events.COMPLETE, () => {

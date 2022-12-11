@@ -1,6 +1,6 @@
 import PokerScene from "./scenes/PokerScene";
 
-const config: Phaser.Types.Core.GameConfig = {
+export const gameConfig: Phaser.Types.Core.GameConfig = {
     width: 1920,
     type: Phaser.AUTO,
     parent: 'phaser-container',
@@ -14,6 +14,4 @@ const config: Phaser.Types.Core.GameConfig = {
         createContainer: true
     },
     scene: [PokerScene],
-}
-
-export default new Phaser.Game(config);
+};

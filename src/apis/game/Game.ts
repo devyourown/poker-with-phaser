@@ -1,6 +1,5 @@
-import { Methods } from './../../utils/api';
+import { Methods } from '../../utils/api';
 import call from '../../utils/api';
-import Player from '../player/Player';
 import Card from '../card/Card';
 
 export enum GameStatus {
@@ -63,8 +62,17 @@ export default class Game {
         });
     }
 
+    getGameResult() {
+        call("/game/result", Methods.GET)?.then((response) => {
+            if (response.status === 200) {
+                
+            }
+        });
+    }
+
     getGame() {
-        call("/game/game", Methods.GET)?.then((response: any) => {
+        this.isChanged = false;
+        call("/game/game", Methods.GET)?.then((response) => {
             if (response.status === 200) {
                 this.setBoard(response.data.board);
                 this.potSize = response.data.potSize;
@@ -73,6 +81,7 @@ export default class Game {
                 this.currentTurnIndex = response.data.currentTurnIndex;
                 this.lastActionIndex = response.data.lastActionIndex;
                 this.lastAction = response.data.lastAction;
+                this.isChanged = true;
             }
         });
     }
@@ -94,6 +103,10 @@ export default class Game {
             action: action,
             betSize: betSize,
         });
+    }
+
+    isGameChanged() {
+        return this.isChanged;
     }
 
     isMyTurn() {

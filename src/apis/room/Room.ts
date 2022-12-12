@@ -11,8 +11,8 @@ export class Room {
     constructor(roomId: string) {
         this.roomId = roomId;
         this.players = [];
-        this.isChanged = true;
         this.update();
+        this.isChanged = false;
     }
 
 
@@ -22,14 +22,9 @@ export class Room {
         roomId: this.roomId,
       })?.then((response) => {
         if (response.status === 200) {
-          if (this.isPlayerChanged(response.data.players)) {
-            this.setPlayers(response.data.players);
-            this.isChanged = true;
-          }
-          if (this.status !== response.data.status) {
-            this.status = response.data.status;
-            this.isChanged = true;
-          }
+          this.setPlayers(response.data.players);
+          this.status = response.data.status;
+          this.isChanged = true;
         }
       });
     }
@@ -81,10 +76,6 @@ export class Room {
       })?.then((response) => {
         this.status = response.data.status;
       });
-  }
-
-    getIschanged(): boolean {
-      return this.isChanged;
     }
 
     getPlayers() {
@@ -97,5 +88,9 @@ export class Room {
 
     getRoomStatus() {
       return this.status;
+    }
+
+    isRoomChanged() {
+      return this.isChanged;
     }
 }

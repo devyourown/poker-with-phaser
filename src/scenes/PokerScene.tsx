@@ -1,8 +1,8 @@
 import Phaser from "phaser";
-import Card from "../domain/card/Card";
-import Game from "../domain/game/Game";
-import Player from "../domain/player/Player";
-import { Room } from "../domain/room/Room";
+import Card from "../apis/card/Card";
+import Game from "../apis/game/Game";
+import Player from "../apis/player/Player";
+import { Room } from "../apis/room/Room";
 
 const firstPosX = 300;
 const firstPosY = 150;
@@ -18,6 +18,7 @@ export default class PokerScene extends Phaser.Scene {
     private lastActionIndex: number;
     private frameTime: number;
     private readyButton: Phaser.GameObjects.Text;
+    private players: Player[];
 
     constructor() {
         super('PokerScene');
@@ -41,8 +42,6 @@ export default class PokerScene extends Phaser.Scene {
     }
 
     private drawRoom() {
-        if (!this.room.getIschanged())
-            return ;
         this.drawPlayerCircle();
         this.drawRoomButton();
         this.drawPlayers();
@@ -61,26 +60,29 @@ export default class PokerScene extends Phaser.Scene {
     }
 
     private drawRoomButton() {
-        if (this.readyButton === null)
+        if (this.readyButton !== undefined)
             return ;
         this.readyButton = this.add.text(675, 300, 'Ready')
         .setInteractive()
-        .on('pointerdown', () => this.onReady(this.readyButton));
+        .on('pointerdown', () => this.onReady());
     }
 
-    private onReady(button: Phaser.GameObjects.Text) {
-        const text = button.text === 'Ready' ? 'Cancel' : 'Ready';
-        button.setText(text);
+    private onReady() {
+        const text = this.readyButton.text === 'Ready' ?
+         'Cancel' : 'Ready';
+        this.readyButton.setText(text);
         this.room.readyPlayer();
     }
 
     private drawPlayers() {
-        const players: Player[] = this.room.getPlayers();
-        for (let i =0; i<players.length; i++) {
+        if (this.players.length === this.room.getPlayers().length)
+            return ;
+        this.players = this.room.getPlayers();
+        for (let i =0; i < this.players.length; i++) {
             this.add.text(playerPosition[i][0] - 40, 
-                playerPosition[i][1] + 40, players[i].getNickname);
+                playerPosition[i][1] + 40, this.players[i].getNickname);
             this.add.text(playerPosition[i][0] - 40, 
-                playerPosition[i][1] + 60, players[i].getMoney.toString());
+                playerPosition[i][1] + 60, this.players[i].getMoney.toString());
         }
     }
 
@@ -88,12 +90,16 @@ export default class PokerScene extends Phaser.Scene {
         this.frameTime += delta;
         if (this.frameTime < 3000)
             return ;
+        this.frameTime = 0;
         this.room.update();
-        this.drawRoom();
+        if (this.room.isRoomChanged()) {
+            this.scene.restart();
+            this.drawRoom();
+        }
         if ("PLAYING" === this.room.getRoomStatus()) {
-            this.frameTime = 0;
             this.getGame();
-            this.drawGame();
+            if (this.pokerGame?.isGameChanged())
+                this.drawGame();
         }
     }
 
@@ -153,7 +159,7 @@ export default class PokerScene extends Phaser.Scene {
     }
 
     private drawPlayerCards() {
-        for (let i=0; i<this.room.getPlayers.length; i++) {
+        for (let i=0; i<this.room.getPlayers().length; i++) {
             if (i === this.pokerGame!.getPlayerIndex()) {
                 this.drawHands(i);
                 continue;

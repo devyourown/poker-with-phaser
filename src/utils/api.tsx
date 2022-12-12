@@ -7,7 +7,7 @@ export enum Methods {
     DELETE = "DELETE"
 }
 
-const API_END_POINT = "http://localhost:8080"
+const API_END_POINT = "http://10.18.240.198:8080"
 
 export default function call(api: string, method: Methods, data?: any) {
     let result;

@@ -4,7 +4,7 @@ import { gameConfig } from "../PhaserGame";
 
 function MultiRoom() {
   if (!localStorage.getItem("roomId")) window.location.href = "/";
-  const game = new Phaser.Game(gameConfig);
+  new Phaser.Game(gameConfig);
   return <div id="phaser-container"></div>;
 }
 

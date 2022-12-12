@@ -62,14 +62,6 @@ export default class Game {
         });
     }
 
-    getGameResult() {
-        call("/game/result", Methods.GET)?.then((response) => {
-            if (response.status === 200) {
-                
-            }
-        });
-    }
-
     getGame() {
         this.isChanged = false;
         call("/game/game", Methods.GET)?.then((response) => {
@@ -103,6 +95,10 @@ export default class Game {
             action: action,
             betSize: betSize,
         });
+    }
+
+    isEnd() {
+        return this.status === "END";
     }
 
     isGameChanged() {

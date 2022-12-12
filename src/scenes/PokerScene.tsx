@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import Card from "../apis/card/Card";
 import Game from "../apis/game/Game";
+import GameResult from "../apis/game/GameResult";
 import Player from "../apis/player/Player";
 import { Room } from "../apis/room/Room";
 
@@ -110,6 +111,10 @@ export default class PokerScene extends Phaser.Scene {
     }
 
     private drawGame() {
+        if (this.pokerGame?.isEnd()) {
+            const gameResult = this.drawGameResult();
+            this.drawAfterGame(gameResult);
+        }
         this.drawPlayerCards();
         this.drawCurrentTurnLight();
         this.drawBoard();
@@ -117,6 +122,17 @@ export default class PokerScene extends Phaser.Scene {
         this.drawAction();
         if (this.pokerGame?.isMyTurn())
             this.drawActionForm();
+    }
+
+    private drawGameResult(): GameResult {
+        const gameResult = new GameResult();
+        //draw gameResult
+        return gameResult;
+    }
+
+    private drawAfterGame(result: GameResult) {
+        //if game should be removed, init room
+        //else reset game, and resume game
     }
 
     private drawCurrentTurnLight() {

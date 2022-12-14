@@ -3,7 +3,7 @@ export enum PlayerStatus {
     PLAYING
 }
 
-export default class Player {
+export default class PlayerDTO {
     private money: number;
     private nikcname: string;
     private status: boolean;

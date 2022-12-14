@@ -1,5 +1,5 @@
-import Player from "../apis/player/Player";
-import Room from "../apis/room/Room";
+import Player from "../apis/player/PlayerDTO";
+import Room from "../apis/room/RoomDTO";
 import { playerPosition } from "./PokerScene";
 
 export interface RoomPainterProp {

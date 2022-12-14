@@ -1,4 +1,4 @@
-export default class Card {
+export default class CardDTO {
     private suit: string;
     private value: string;
 

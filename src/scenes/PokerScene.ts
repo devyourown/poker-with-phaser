@@ -1,6 +1,6 @@
 import Phaser from "phaser";
-import Game from "../apis/game/Game";
-import Room from "../apis/room/Room";
+import Game from "../apis/game/GameDTO";
+import Room from "../apis/room/RoomDTO";
 import GamePainter from "./GamePainter";
 import RoomPainter from "./RoomPainter";
 

@@ -1,6 +1,6 @@
 import { playerPosition } from './PokerScene';
-import Game from "../apis/game/Game";
-import Card from '../apis/card/Card';
+import Game from "../apis/game/GameDTO";
+import Card from '../apis/card/CardDTO';
 
 export interface CardPainterProp {
     scene: Phaser.Scene,

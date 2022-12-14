@@ -1,5 +1,5 @@
-import Game from "../apis/game/Game";
-import Room from "../apis/room/Room";
+import Game from "../apis/game/GameDTO";
+import Room from "../apis/room/RoomDTO";
 import ActionPainter from "./ActionPainter";
 import CardPainter from "./CardPainter";
 import GameResultPainter from "./GameResultPainter";

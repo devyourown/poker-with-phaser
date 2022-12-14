@@ -1,4 +1,4 @@
-import Game from "../apis/game/Game";
+import Game from "../apis/game/GameDTO";
 import { playerPosition } from "./PokerScene";
 
 export interface ActionPainterProp {

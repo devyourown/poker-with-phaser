@@ -1,6 +1,6 @@
 import { Methods } from '../../utils/api';
 import call from '../../utils/api';
-import Card from '../card/Card';
+import Card from '../card/CardDTO';
 
 export enum GameStatus {
     PRE_FLOP,
@@ -23,7 +23,7 @@ export interface GameProp {
     big: number
 }
 
-export default class Game {
+export default class GameDTO {
     private gameId: string;
     private currentTurnIndex: number;
     private board: Card[];

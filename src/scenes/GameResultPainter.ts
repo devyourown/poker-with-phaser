@@ -1,4 +1,4 @@
-import GameResult from "../apis/game/GameResult";
+import GameResult from "../apis/game/GameResultDTO";
 
 export default class GameResultPainter {
     private scene: Phaser.Scene;

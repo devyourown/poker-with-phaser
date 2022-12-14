@@ -1,8 +1,8 @@
 import call, { Methods } from "../../utils/api";
-import Game, { GameProp } from "../game/Game";
-import Player from "../player/Player";
+import Game from "../game/GameDTO";
+import Player from "../player/PlayerDTO";
 
-export default class Room {
+export default class RoomDTO {
     private roomId: string;
     private players: Player[]
     private status: string;
@@ -29,16 +29,6 @@ export default class Room {
       });
     }
 
-    private isPlayerChanged(players: any[]): boolean {
-      if (this.players.length !== players.length)
-        return true;
-      for (let i=0; i < players.length; i++) {
-        if (this.players[i].getNickname !== players[i].nickname)
-          return true;
-      }
-      return false;
-    }
-
     private setPlayers(players: any[]) {
       if (players.length === this.players.length)
         return;
@@ -52,13 +42,16 @@ export default class Room {
       });
     }
 
+    leaveRoom() {
+      call("/room-out", Methods.POST, {});
+    }
+
     makeGame() {
-      const prop: GameProp = {
+      return new Game({
         playerIndex: this.getPlayerIndex(),
         small: 100,
         big: 200,
-      }
-      return new Game(prop);
+      });
     }
 
     private getPlayerIndex(): number {
@@ -80,10 +73,6 @@ export default class Room {
 
     getPlayers() {
       return this.players;
-    }
-
-    getOutOfRoom() {
-        call("/room-out", Methods.POST, {});
     }
 
     getRoomStatus() {

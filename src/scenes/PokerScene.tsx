@@ -2,12 +2,12 @@ import Phaser from "phaser";
 import Card from "../apis/card/Card";
 import Game from "../apis/game/Game";
 import GameResult from "../apis/game/GameResult";
-import Player from "../apis/player/Player";
-import { Room } from "../apis/room/Room";
+import Room from "../apis/room/Room";
+import RoomPainter, { RoomPainterProp } from "./RoomPainter";
 
 const firstPosX = 300;
 const firstPosY = 150;
-const playerPosition = [[firstPosX, firstPosY + 150], 
+export const playerPosition = [[firstPosX, firstPosY + 150], 
 [firstPosX + 200, firstPosY], [firstPosX + 400, firstPosY], 
 [firstPosX + 600, firstPosY], [firstPosX + 800, firstPosY + 150], 
 [firstPosX + 200, firstPosY + 340], [firstPosX + 400, firstPosY + 340], 
@@ -18,8 +18,7 @@ export default class PokerScene extends Phaser.Scene {
     private pokerGame: Game | null;
     private lastActionIndex: number;
     private frameTime: number;
-    private readyButton: Phaser.GameObjects.Text;
-    private players: Player[];
+    private roomPainter: RoomPainter;
 
     constructor() {
         super('PokerScene');
@@ -39,52 +38,12 @@ export default class PokerScene extends Phaser.Scene {
         if (roomId === null)
             return ;
         this.room = new Room(roomId);
-        this.drawRoom();
-    }
-
-    private drawRoom() {
-        this.drawPlayerCircle();
-        this.drawRoomButton();
-        this.drawPlayers();
-    }
-
-    private drawPlayerCircle() {
-        for (let i=0; i<playerPosition.length; i++) {
-            if (this.room.getPlayers().length > i) {
-                const user = this.add.image(playerPosition[i][0], playerPosition[i][1], 'user');
-                user.scale = 0.6;
-            } else {
-                this.add.circle(playerPosition[i][0], playerPosition[i][1], 30)
-                .setStrokeStyle(1, 0x33adfd);
-            }
+        const prop: RoomPainterProp = {
+            room: this.room,
+            scene: this,
         }
-    }
-
-    private drawRoomButton() {
-        if (this.readyButton !== undefined)
-            return ;
-        this.readyButton = this.add.text(675, 300, 'Ready')
-        .setInteractive()
-        .on('pointerdown', () => this.onReady());
-    }
-
-    private onReady() {
-        const text = this.readyButton.text === 'Ready' ?
-         'Cancel' : 'Ready';
-        this.readyButton.setText(text);
-        this.room.readyPlayer();
-    }
-
-    private drawPlayers() {
-        if (this.players.length === this.room.getPlayers().length)
-            return ;
-        this.players = this.room.getPlayers();
-        for (let i =0; i < this.players.length; i++) {
-            this.add.text(playerPosition[i][0] - 40, 
-                playerPosition[i][1] + 40, this.players[i].getNickname);
-            this.add.text(playerPosition[i][0] - 40, 
-                playerPosition[i][1] + 60, this.players[i].getMoney.toString());
-        }
+        this.roomPainter = new RoomPainter(prop);
+        this.roomPainter.drawRoom();
     }
 
     update(time: number, delta: number) {
@@ -95,12 +54,16 @@ export default class PokerScene extends Phaser.Scene {
         this.room.update();
         if (this.room.isRoomChanged()) {
             this.scene.restart();
-            this.drawRoom();
+            this.roomPainter.drawRoom();
         }
         if ("PLAYING" === this.room.getRoomStatus()) {
             this.getGame();
             if (this.pokerGame?.isGameChanged())
                 this.drawGame();
+            if (this.pokerGame?.isEnd()) {
+                const result = this.drawGameResult();
+                this.drawAfterGame(result);
+            }
         }
     }
 

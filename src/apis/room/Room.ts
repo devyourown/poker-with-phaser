@@ -2,7 +2,7 @@ import call, { Methods } from "../../utils/api";
 import Game, { GameProp } from "../game/Game";
 import Player from "../player/Player";
 
-export class Room {
+export default class Room {
     private roomId: string;
     private players: Player[]
     private status: string;

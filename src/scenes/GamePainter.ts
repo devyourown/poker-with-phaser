@@ -1,7 +1,7 @@
 import Card from "../apis/card/Card";
 import Game from "../apis/game/Game";
-import GameResult from "../apis/game/GameResult";
 import Room from "../apis/room/Room";
+import GameResultPainter from "./GameResultPainter";
 import { playerPosition } from "./PokerScene";
 
 export interface GamePainterProp {
@@ -25,8 +25,9 @@ export default class GamePainter {
 
     public drawGame() {
         if (this.game.isEnd()) {
-            const gameResult = this.drawGameResult();
-            this.drawAfterGame(gameResult);
+            const gameResultPainter = new GameResultPainter(this.scene);
+            gameResultPainter.drawGameResult();
+            return ;
         }
         this.drawPlayerCards();
         this.drawCurrentTurnLight();
@@ -35,17 +36,6 @@ export default class GamePainter {
         this.drawAction();
         if (this.game.isMyTurn())
             this.drawActionForm();
-    }
-
-    private drawGameResult(): GameResult {
-        const gameResult = new GameResult();
-        //draw gameResult
-        return gameResult;
-    }
-
-    private drawAfterGame(result: GameResult) {
-        //if game should be removed, init room
-        //else reset game, and resume game
     }
 
     private drawPlayerCards() {

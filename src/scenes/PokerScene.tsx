@@ -35,13 +35,17 @@ export default class PokerScene extends Phaser.Scene {
         const roomId: string = localStorage.getItem("roomId")!;
         if (roomId === null)
             return ;
+        this.makeRoomAndPainter(roomId);
+        this.roomPainter.drawRoom();
+    }
+
+    private makeRoomAndPainter(roomId: string) {
         this.room = new Room(roomId);
         const prop: RoomPainterProp = {
             room: this.room,
             scene: this,
         }
         this.roomPainter = new RoomPainter(prop);
-        this.roomPainter.drawRoom();
     }
 
     update(time: number, delta: number) {
@@ -63,14 +67,18 @@ export default class PokerScene extends Phaser.Scene {
 
     private getGame() {
         if (this.pokerGame === null) {
-            this.pokerGame = this.room.makeGame();
-            const prop: GamePainterProp = {
-                scene: this,
-                game: this.pokerGame,
-                room: this.room
-            }
-            this.gamePainter = new GamePainter(prop);
+            this.makeGameAndPainter();
         }
-        this.pokerGame.getGame();
+        this.pokerGame?.getGame();
+    }
+
+    private makeGameAndPainter() {
+        this.pokerGame = this.room.makeGame();
+        const prop: GamePainterProp = {
+            scene: this,
+            game: this.pokerGame,
+            room: this.room
+        }
+        this.gamePainter = new GamePainter(prop);
     }
 }

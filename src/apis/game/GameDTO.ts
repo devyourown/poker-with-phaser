@@ -1,21 +1,5 @@
-import { Methods } from '../../utils/api';
-import call from '../../utils/api';
 import Card from '../card/CardDTO';
-
-export enum GameStatus {
-    PRE_FLOP,
-    FLOP,
-    TURN,
-    RIVER,
-    END
-}
-
-export enum Action {
-    FOLD,
-    CHECK,
-    CALL,
-    BET
-}
+import GameApi from './GameApi';
 
 export interface GameProp {
     playerIndex: number,
@@ -38,44 +22,28 @@ export default class GameDTO {
 
     constructor({playerIndex, small, big}: GameProp) {
         this.playerIndex = playerIndex;
-        call("/game/game", Methods.POST)?.then((response) => {
-            if (response.status === 200) {
-              this.gameId = response.data.gameId;
-              this.board = [];
-              this.potSize = small + big;
-              this.currentBetSize = big;
-              this.lastActionIndex = -1;
-              this.setHands();
-            }
-        });
+        this.gameId = GameApi.getGameId().gameId;
+        this.board = [];
+        this.potSize = small + big;
+        this.currentBetSize = big;
+        this.lastActionIndex = -1;
+        this.setHands();
     }
 
     private setHands() {
-        call("/game/hands", Methods.GET)?.then((response) => {
-            this.hands = [];
-            for (let i=0; i<2; i++) {
-                this.hands.push(new Card(
-                    response.data.hands[i].suit,
-                    response.data.hands[i].value
-                ));
-            }
-        });
+        this.hands = GameApi.getHands().hands;
     }
 
     getGame() {
-        this.isChanged = false;
-        call("/game/game", Methods.GET)?.then((response) => {
-            if (response.status === 200) {
-                this.setBoard(response.data.board);
-                this.potSize = response.data.potSize;
-                this.currentBetSize = response.data.currentBet;
-                this.status = response.data.gameStatus;
-                this.currentTurnIndex = response.data.currentTurnIndex;
-                this.lastActionIndex = response.data.lastActionIndex;
-                this.lastAction = response.data.lastAction;
-                this.isChanged = true;
-            }
-        });
+        const result = GameApi.getGame();
+        this.setBoard(result.board);
+        this.potSize = result.potSize;
+        this.currentBetSize = result.currentBet;
+        this.status = result.gameStatus;
+        this.currentTurnIndex = result.currentTurnIndex;
+        this.lastActionIndex = result.lastActionIndex;
+        this.lastAction = result.lastAction;
+        this.isChanged = result.isChanged;
     }
 
     private setBoard(board: any[]) {
@@ -90,11 +58,7 @@ export default class GameDTO {
     }
 
     playAction(action: String, betSize: number) {
-        call("/game/action", Methods.POST, {
-            gameId: this.gameId,
-            action: action,
-            betSize: betSize,
-        });
+        GameApi.playAction(this.gameId, action, betSize);
     }
 
     isEnd() {

@@ -60,7 +60,7 @@ export default class PokerScene extends Phaser.Scene {
         }
         if ("PLAYING" === this.room.getRoomStatus()) {
             this.getGame();
-            if (this.pokerGame?.isGameChanged())
+            if (this.pokerGame.isGameChanged())
                 this.gamePainter.drawGame();
         }
     }

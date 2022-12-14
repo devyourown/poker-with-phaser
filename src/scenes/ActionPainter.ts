@@ -3,8 +3,7 @@ import { playerPosition } from "./PokerScene";
 
 export interface ActionPainterProp {
     scene: Phaser.Scene,
-    game: Game,
-    lastActionIndex: number;
+    game: Game;
 }
 
 export default class ActionPainter {
@@ -12,10 +11,10 @@ export default class ActionPainter {
     private game: Game;
     private lastActionIndex: number;
 
-    constructor({scene, game, lastActionIndex}: ActionPainterProp) {
+    constructor({scene, game}: ActionPainterProp) {
         this.scene = scene;
         this.game = game;
-        this.lastActionIndex = lastActionIndex;
+        this.lastActionIndex = -1;
     }
 
     public drawAction() {

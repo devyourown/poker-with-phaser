@@ -14,7 +14,6 @@ export interface GamePainterProp {
 export default class GamePainter {
     private scene: Phaser.Scene;
     private game: Game;
-    private lastActionIndex: number;
     private room: Room;
     private cardPainter: CardPainter;
     private actionPainter: ActionPainter;
@@ -23,7 +22,6 @@ export default class GamePainter {
         this.scene = scene;
         this.game = game;
         this.room = room;
-        this.lastActionIndex = -1;
         this.cardPainter = new CardPainter({
             scene: this.scene,
             game: this.game,
@@ -31,8 +29,7 @@ export default class GamePainter {
         });
         this.actionPainter = new ActionPainter({
             scene: this.scene,
-            game: this.game,
-            lastActionIndex: this.lastActionIndex
+            game: this.game
         });
     }
 

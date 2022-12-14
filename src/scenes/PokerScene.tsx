@@ -1,8 +1,8 @@
 import Phaser from "phaser";
 import Game from "../apis/game/Game";
 import Room from "../apis/room/Room";
-import GamePainter, { GamePainterProp } from "./GamePainter";
-import RoomPainter, { RoomPainterProp } from "./RoomPainter";
+import GamePainter from "./GamePainter";
+import RoomPainter from "./RoomPainter";
 
 const firstPosX = 300;
 const firstPosY = 150;
@@ -41,11 +41,10 @@ export default class PokerScene extends Phaser.Scene {
 
     private makeRoomAndPainter(roomId: string) {
         this.room = new Room(roomId);
-        const prop: RoomPainterProp = {
+        this.roomPainter = new RoomPainter({
             room: this.room,
-            scene: this,
-        }
-        this.roomPainter = new RoomPainter(prop);
+            scene: this
+        });
     }
 
     update(time: number, delta: number) {
@@ -74,11 +73,10 @@ export default class PokerScene extends Phaser.Scene {
 
     private makeGameAndPainter() {
         this.pokerGame = this.room.makeGame();
-        const prop: GamePainterProp = {
+        this.gamePainter = new GamePainter({
             scene: this,
             game: this.pokerGame,
             room: this.room
-        }
-        this.gamePainter = new GamePainter(prop);
+        });
     }
 }

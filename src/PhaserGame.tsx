@@ -2,6 +2,7 @@ import PokerScene from "./scenes/PokerScene";
 
 export const gameConfig: Phaser.Types.Core.GameConfig = {
     width: 1920,
+    height: 1024,
     type: Phaser.AUTO,
     parent: 'phaser-container',
     physics: {

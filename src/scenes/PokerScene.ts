@@ -14,7 +14,7 @@ export const playerPosition = [[firstPosX, firstPosY + 150],
 
 export default class PokerScene extends Phaser.Scene {
     private room: Room;
-    private pokerGame: Game | null;
+    private pokerGame: Game;
     private frameTime: number;
     private roomPainter: RoomPainter;
     private gamePainter: GamePainter;
@@ -22,7 +22,6 @@ export default class PokerScene extends Phaser.Scene {
     constructor() {
         super('PokerScene');
         this.frameTime = 0;
-        this.pokerGame = null;
     }
 
     preload() {
@@ -33,8 +32,10 @@ export default class PokerScene extends Phaser.Scene {
 
     create() {
         const roomId: string = localStorage.getItem("roomId")!;
-        if (roomId === null)
+        if (roomId === null) {
+            window.location.href = "/";
             return ;
+        }
         this.makeRoomAndPainter(roomId);
         this.roomPainter.drawRoom();
     }
@@ -65,10 +66,10 @@ export default class PokerScene extends Phaser.Scene {
     }
 
     private getGame() {
-        if (this.pokerGame === null) {
+        if (this.pokerGame === undefined) {
             this.makeGameAndPainter();
         }
-        this.pokerGame?.getGame();
+        this.pokerGame.getGame();
     }
 
     private makeGameAndPainter() {

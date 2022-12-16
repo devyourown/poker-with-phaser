@@ -54,11 +54,25 @@ export default class GameDTO {
                 value.suit,
                 value.value
             ));
-        })
+        });
     }
 
-    playAction(action: String, betSize: number) {
+    playAction(action: string, betSize: number) {
+        this.validateAction(action, betSize);
         GameApi.playAction(this.gameId, action, betSize);
+    }
+
+    private validateAction(action: string, betSize: number) {
+        if (action === "BET" && betSize < this.currentBetSize)
+            throw new Error("BetSize is small");
+    }
+
+    restart() {
+
+    }
+
+    destroy() {
+
     }
 
     isEnd() {
@@ -99,5 +113,9 @@ export default class GameDTO {
 
     getLastAction() {
         return this.lastAction;
+    }
+
+    getCurrentBetSize() {
+        return this.currentBetSize;
     }
 }

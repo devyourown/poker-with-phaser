@@ -13,9 +13,4 @@ export default class GameResultPainter {
         //draw gameResult
         return gameResult;
     }
-
-    private drawAfterGame(result: GameResult) {
-        //if game should be removed, init room
-        //else reset game, and resume game
-    }
 }

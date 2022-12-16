@@ -7,6 +7,7 @@ export default class RoomDTO {
     private players: Player[]
     private status: string;
     private isChanged: boolean;
+    private hasPersonLeaving: boolean;
 
     constructor(roomId: string) {
         this.roomId = roomId;
@@ -81,5 +82,9 @@ export default class RoomDTO {
 
     isRoomChanged() {
       return this.isChanged;
+    }
+
+    hasLeaving() {
+      return this.hasPersonLeaving;
     }
 }

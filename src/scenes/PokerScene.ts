@@ -18,6 +18,7 @@ export default class PokerScene extends Phaser.Scene {
     private frameTime: number;
     private roomPainter: RoomPainter;
     private gamePainter: GamePainter;
+    private isLeaving: boolean;
 
     constructor() {
         super('PokerScene');
@@ -62,6 +63,8 @@ export default class PokerScene extends Phaser.Scene {
             this.getGame();
             if (this.pokerGame.isGameChanged())
                 this.gamePainter.drawGame();
+            if (this.pokerGame.isEnd())
+                this.dealWithAfterGame();
         }
     }
 
@@ -79,5 +82,13 @@ export default class PokerScene extends Phaser.Scene {
             game: this.pokerGame,
             room: this.room
         });
+    }
+
+    private dealWithAfterGame() {
+        if (!this.room.hasLeaving())
+            this.pokerGame.restart();
+        this.pokerGame.destroy();
+        if (this.isLeaving)
+            this.room.leaveRoom();
     }
 }

@@ -68,11 +68,11 @@ export default class GameDTO {
     }
 
     restart() {
-
+        GameApi.restartGame();
     }
 
-    destroy() {
-
+    leaveGame() {
+        GameApi.leaveGame();
     }
 
     isEnd() {

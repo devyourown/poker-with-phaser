@@ -7,7 +7,7 @@ export default class RoomDTO {
     private players: Player[]
     private status: string;
     private isChanged: boolean;
-    private hasPersonLeaving: boolean;
+    private shouldStop: boolean;
 
     constructor(roomId: string) {
         this.roomId = roomId;
@@ -25,6 +25,7 @@ export default class RoomDTO {
         if (response.status === 200) {
           this.setPlayers(response.data.players);
           this.status = response.data.status;
+          this.shouldStop = response.data.shouldStop;
           this.isChanged = true;
         }
       });
@@ -64,6 +65,10 @@ export default class RoomDTO {
       return -1;
     }
 
+    readyToExit() {
+      
+    }
+
     readyPlayer() {
       call("/room/player-status-change", Methods.POST, {
           roomId: this.roomId,
@@ -84,7 +89,7 @@ export default class RoomDTO {
       return this.isChanged;
     }
 
-    hasLeaving() {
-      return this.hasPersonLeaving;
+    shouldRoomStop() {
+      return this.shouldStop;
     }
 }

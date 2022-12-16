@@ -27,6 +27,14 @@ export default class GameApi {
         return result;
     }
 
+    public static leaveGame() {
+        call("/game/leave", Methods.POST);
+    }
+
+    public static restartGame() {
+        call("/game/restart", Methods.POST);
+    }
+
     public static getGame() {
         const result: any = {};
         result.isChanged = false;

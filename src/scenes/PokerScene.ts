@@ -85,9 +85,9 @@ export default class PokerScene extends Phaser.Scene {
     }
 
     private dealWithAfterGame() {
-        if (!this.room.hasLeaving())
+        if (!this.room.shouldRoomStop())
             this.pokerGame.restart();
-        this.pokerGame.destroy();
+        this.pokerGame.leaveGame();
         if (this.isLeaving)
             this.room.leaveRoom();
     }

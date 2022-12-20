@@ -16,6 +16,7 @@ export default class RoomPainter {
     constructor({room, scene}: RoomPainterProp) {
         this.room = room;
         this.scene = scene;
+        this.players = [];
     }
 
     public drawRoom() {
@@ -25,7 +26,7 @@ export default class RoomPainter {
     }
 
     private drawPlayerCircle() {
-        for (let i=0; i<playerPosition.length; i++) {
+        for (let i=0; i < playerPosition.length; i++) {
             if (this.room.getPlayers().length > i) {
                 const user = this.scene.add.image(
                     playerPosition[i][0], 

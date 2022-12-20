@@ -1,6 +1,6 @@
-import call, { Methods } from "../../utils/api";
 import Game from "../game/GameDTO";
 import Player from "../player/PlayerDTO";
+import RoomApi from "./RoomApi";
 
 export default class RoomDTO {
     private roomId: string;
@@ -18,17 +18,10 @@ export default class RoomDTO {
 
 
     update() {
-      this.isChanged = false;
-      call("/room/room-status", Methods.POST, {
-        roomId: this.roomId,
-      })?.then((response) => {
-        if (response.status === 200) {
-          this.setPlayers(response.data.players);
-          this.status = response.data.status;
-          this.shouldStop = response.data.shouldStop;
-          this.isChanged = true;
-        }
-      });
+      const result = RoomApi.getRoomStatus(this.roomId);
+      this.setPlayers(result.players);
+      this.setStatus(result.status);
+      this.setChanged(result.isChanged);
     }
 
     private setPlayers(players: any[]) {
@@ -45,7 +38,7 @@ export default class RoomDTO {
     }
 
     leaveRoom() {
-      call("/room-out", Methods.POST, {});
+      RoomApi.leaveRoom();
     }
 
     makeGame() {
@@ -57,24 +50,24 @@ export default class RoomDTO {
     }
 
     private getPlayerIndex(): number {
-      call("/room/player-index", Methods.GET, {
-        roomId: this.roomId
-      })?.then((response) => {
-        return response.data;
-      });
-      return -1;
+      return RoomApi.getPlayerIndex(this.roomId);
     }
 
     readyToExit() {
-      
+
     }
 
     readyPlayer() {
-      call("/room/player-status-change", Methods.POST, {
-          roomId: this.roomId,
-      })?.then((response) => {
-        this.status = response.data.status;
-      });
+      const status = RoomApi.readyPlayer(this.roomId);
+      this.setStatus(status);
+    }
+
+    setStatus(status: string) {
+      this.status = status;
+    }
+
+    setChanged(isChanged: boolean) {
+      this.isChanged = isChanged;
     }
 
     getPlayers() {

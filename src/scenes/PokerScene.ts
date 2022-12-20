@@ -55,6 +55,7 @@ export default class PokerScene extends Phaser.Scene {
             return ;
         this.frameTime = 0;
         this.room.update();
+        this.roomPainter.drawRoom();
         if (this.room.isRoomChanged()) {
             this.scene.restart();
             this.roomPainter.drawRoom();
